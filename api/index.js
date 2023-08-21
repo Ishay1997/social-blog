@@ -15,9 +15,11 @@ const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
 const secret = 'dhsdsfkjlkdjfe8e33';
 const { Console } = require('console');
+const exp = require('constants');
 app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads',express.static(__dirname+'/uploads'));
 //WgReRcTnPjoBpqug
 //    mongoose.connect('mongodb+srv://blog:981wkEsmhGsI8xx4@cluster0.1q5eyiz.mongodb.net/?retryWrites=true&w=majority');
     mongoose.connect('mongodb+srv://ishay:WgReRcTnPjoBpqug@cluster0.1q5eyiz.mongodb.net/?retryWrites=true&w=majority');
@@ -84,6 +86,12 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     });
 });
 app.get('/post',async (req,res)=>{
-    res.json(await Post.find().populate('author',['username']));
+    res.json(await Post.find().populate('author',['username']).sort({createdAt:-1}
+    ));
 });
+app.get('/post/:id',async(req ,res)=>{
+    const {id} =req.params;
+    const postDoc = await Post.findById(id).populate('author',['username']);
+    res.json(postDoc);
+})
 app.listen(4000);
